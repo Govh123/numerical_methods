@@ -3,15 +3,21 @@ import sympy as sp
 
 def improvedEuler(equation_str: str, h: float, x0: float, y0: float, x_end: float):
     x, y = sp.symbols('x y')
+    equation_str = equation_str.replace('e', 'E')
     f_expr = sp.sympify(equation_str)
     f = sp.lambdify((x, y), f_expr, modules=["numpy", "math"])
     
-    n_list = [0]
     x_values = [x0]
     y_values = [y0]
+    yr_values = []
+    errors = []
+    
+    #calcular yr inicial: e**(- 0.2 + 0.2*x²)
+    yr_initial = np.exp(- 0.2 + 0.2 * x0**2)
+    yr_values.append(yr_initial)
+    errors.append(abs(y0 - yr_initial))
     
     for nextX in np.arange(x0 + h, x_end + h, h):
-        n_list.append(n_list[-1] + 1)
         xn = x_values[-1]
         yn = y_values[-1]
         
@@ -21,12 +27,19 @@ def improvedEuler(equation_str: str, h: float, x0: float, y0: float, x_end: floa
         
         y_values.append(nextY)
         x_values.append(nextX)
+        
+        #calcular yr = e**(- 0.2 + 0.2*x²)
+        yr = np.exp(- 0.2 + 0.2 * nextX**2)
+        yr_values.append(yr)
+        error = abs(nextY - yr)
+        errors.append(error)
 
-    return x_values, y_values, n_list
+    return x_values, y_values, yr_values, errors
 
 
 def newton_raphson(equation_str: str, x0: float, tolerance=1e-6):
     x = sp.symbols('x')
+    equation_str = equation_str.replace('e', 'E')
     f_expr = sp.sympify(equation_str)
     df_expr = sp.diff(f_expr, x)
 
@@ -55,6 +68,7 @@ def newton_raphson(equation_str: str, x0: float, tolerance=1e-6):
 
 def RungeKutta(equation_str: str, h: float, x0: float, y0: float, x_end: float):
     x, y = sp.symbols('x y')
+    equation_str = equation_str.replace('e', 'E')
     f_expr = sp.sympify(equation_str)
     f = sp.lambdify((x, y), f_expr, modules=["numpy", "math"])
     
