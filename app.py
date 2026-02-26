@@ -33,18 +33,20 @@ if method == "Euler Mejorado":
     
     if st.button("Calcular Euler Mejorado"):
         try:
-            x_vals, y_vals, n_list = improvedEuler(eq_euler, h_euler, x0_euler, y0_euler, xend_euler)
+            x_vals, y_vals, yr_vals, errors = improvedEuler(eq_euler, h_euler, x0_euler, y0_euler, xend_euler)
             
             df = pd.DataFrame({
-                'n': n_list,
                 'x': [round(x, 4) for x in x_vals],
-                'y': [round(y, 4) for y in y_vals]
+                'y': [round(y, 4) for y in y_vals],
+                'yr': [round(yr, 4) for yr in yr_vals],
+                'Error Absoluto': [round(e, 6) for e in errors]
             })
             st.write("### Tabla de Resultados")
             st.dataframe(df, use_container_width=True)
             
             fig, ax = plt.subplots(figsize=(10, 5))
             ax.plot(x_vals, y_vals, 'o-', label=f'Euler Mejorado (h={h_euler})', color='green', linewidth=2, markersize=6)
+            ax.plot(x_vals, yr_vals, 's--', label='Solución Exacta', color='red', linewidth=2, markersize=5)
             ax.set_title(f'Solución: dy/dx = {eq_euler}', fontsize=14)
             ax.set_xlabel('x', fontsize=12)
             ax.set_ylabel('y', fontsize=12)
