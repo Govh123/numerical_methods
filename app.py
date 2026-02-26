@@ -7,12 +7,18 @@ from methods import improvedEuler, newton_raphson, RungeKutta
 st.set_page_config(page_title="Métodos Numéricos", layout="wide")
 
 st.title("Métodos Numéricos")
+st.title("Tomar en cuenta las recomendaciones en azul:")
 st.markdown("---")
 
 method = st.sidebar.selectbox(
     "Selecciona el método numérico:",
     ["Euler Mejorado", "Newton-Raphson", "Runge-Kutta 4"]
 )
+
+st.info("Ingresa ecuaciones válidas. Usa 'x', 'y' como variables.")
+st.info("Utiliza * para cada multiplicación, ** para potencias, e o E para Euler, y \\**1/n para raíces.")
+st.info("2xy no es valido, debe ser 2\\*x\\*y. Para raíces: x\\**1/2, e o E para Euler.")
+st.info("Debajo de la tabla esta la grafica.")
 
 if method == "Euler Mejorado":
     st.header("Método de Euler Mejorado")
@@ -21,8 +27,8 @@ if method == "Euler Mejorado":
     col1, col2 = st.columns(2)
     with col1:
         eq_euler = st.text_input(
-            "Ecuación dy/dx (ej: y - x\\**2 + 1, x\\*y, 2\\*x\\*y)",
-            help="Usa 'x' e 'y' como variables"
+            "Ecuación dy/dx (ej: y - x\\**2 + 1, x\\*y, 2\\*x\\*y, e\\**x, x\\**1/2)",
+            help="Usa 'x' e 'y'. Para raíces: x\\**1/2, e o E para Euler"
         )
         h_euler = st.number_input("Paso (h) (ej: 0.2)", min_value=0.01, step=0.01)
         x0_euler = st.number_input("x inicial (ej: 0)")
@@ -36,10 +42,10 @@ if method == "Euler Mejorado":
             x_vals, y_vals, yr_vals, errors = improvedEuler(eq_euler, h_euler, x0_euler, y0_euler, xend_euler)
             
             df = pd.DataFrame({
-                'x': [round(x, 4) for x in x_vals],
-                'y': [round(y, 4) for y in y_vals],
-                'yr': [round(yr, 4) for yr in yr_vals],
-                'Error Absoluto': [round(e, 6) for e in errors]
+                'x': [round(x, 8) for x in x_vals],
+                'y': [round(y, 8) for y in y_vals],
+                'yr': [round(yr, 8) for yr in yr_vals],
+                'Error Absoluto': [round(e, 10) for e in errors]
             })
             st.write("### Tabla de Resultados")
             st.dataframe(df, use_container_width=True)
@@ -65,8 +71,8 @@ elif method == "Newton-Raphson":
     col1, col2 = st.columns(2)
     with col1:
         eq_nr = st.text_input(
-            "Ecuación f(x) (ej: x\\**2 - 4, x\\**3 - 2, sin(x) - 0.5)",
-            help="Usa 'x' como variable"
+            "Ecuación f(x) (ej: x\\**2 - 4, x\\**3 - 2, sin(x) - 0.5, e\\**x - 1, x\\**1/2 - 2)",
+            help="Usa 'x'. Para raíces: x\\**1/2, e o E para Euler"
         )
     with col2:
         x0_nr = st.number_input("Valor inicial (ej: 2)")
@@ -79,13 +85,14 @@ elif method == "Newton-Raphson":
                 st.warning("No se pudo encontrar la raíz con los parámetros dados.")
             else:
                 df_table = pd.DataFrame({
-                    'x': [round(x, 6) for x in x_values],
-                    'f(x)': [round(f(x), 6) for x in x_values]
+                    'x': [round(x, 10) for x in x_values],
+                    'f(x)': [round(f(x), 10) for x in x_values],
+                    "f'(x)": [round(df(x), 10) for x in x_values]
                 })
                 st.write("### Iteraciones")
                 st.dataframe(df_table, use_container_width=True)
                 
-                st.success(f"**Raíz encontrada: {root:.6f}**")
+                st.success(f"**Raíz encontrada: {root:.10f}**")
                 
                 margin = 1.0
                 x_range = np.linspace(min(x_values) - margin, max(x_values) + margin, 500)
@@ -94,7 +101,7 @@ elif method == "Newton-Raphson":
                 fig, ax = plt.subplots(figsize=(10, 5))
                 ax.plot(x_range, y_range, label=f'f(x) = {eq_nr}', color='blue', lw=2)
                 ax.axhline(0, color='black', lw=1, linestyle='--', alpha=0.5)
-                ax.scatter(root, 0, color='green', s=200, edgecolors='black', label=f'Raíz: {root:.4f}', zorder=6, marker='*')
+                ax.scatter(root, 0, color='green', s=200, edgecolors='black', label=f'Raíz: {root:.8f}', zorder=6, marker='*')
                 ax.set_title(f'Newton-Raphson: f(x) = {eq_nr}', fontsize=14)
                 ax.set_xlabel('x', fontsize=12)
                 ax.set_ylabel('f(x)', fontsize=12)
@@ -113,8 +120,8 @@ elif method == "Runge-Kutta 4":
     col1, col2 = st.columns(2)
     with col1:
         eq_rk = st.text_input(
-            "Ecuación dy/dx (ej: 2\\*x\\*y, x\\*y, y - x)",
-            help="Usa 'x' e 'y' como variables"
+            "Ecuación dy/dx (ej: 2\\*x\\*y, x\\*y, y - x, e\\**x, x\\**1/2)",
+            help="Usa 'x' e 'y'. Para raíces: x\\**1/2, e o E para Euler"
         )
         h_rk = st.number_input("Tamaño de paso (ej: 0.1)", min_value=0.01, step=0.01)
         x0_rk = st.number_input("x inicial (ej: 0)")
@@ -130,16 +137,16 @@ elif method == "Runge-Kutta 4":
             table_data = []
             for i in range(len(x_vals)):
                 row = {
-                    'x': round(x_vals[i], 4),
-                    'y': round(y_vals[i], 4)
+                    'x': round(x_vals[i], 8),
+                    'y': round(y_vals[i], 8)
                 }
                 if i < len(ks_values):
                     k1, k2, k3, k4, k = ks_values[i]
-                    row['k1'] = round(k1, 4)
-                    row['k2'] = round(k2, 4)
-                    row['k3'] = round(k3, 4)
-                    row['k4'] = round(k4, 4)
-                    row['k'] = round(k, 4)
+                    row['k1'] = round(k1, 8)
+                    row['k2'] = round(k2, 8)
+                    row['k3'] = round(k3, 8)
+                    row['k4'] = round(k4, 8)
+                    row['k'] = round(k, 8)
                 table_data.append(row)
             
             df_rk = pd.DataFrame(table_data)
@@ -159,4 +166,3 @@ elif method == "Runge-Kutta 4":
             st.error(f"Error: {str(e)}")
 
 st.markdown("---")
-st.info("Ingresa ecuaciones válidas en Python. Usa 'x', 'y' como variables.")
