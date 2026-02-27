@@ -6,8 +6,9 @@ from methods import improvedEuler, newton_raphson, RungeKutta
 
 st.set_page_config(page_title="Métodos Numéricos", layout="wide")
 
-st.title("Métodos Numéricos")
-st.title("Tomar en cuenta las recomendaciones en azul:")
+st.title("Hugo Alexis Ramírez Villarreal - 23170064")
+st.header("Métodos Numéricos ")
+st.header("Tomar en cuenta las recomendaciones en azul:")
 st.markdown("---")
 
 method = st.sidebar.selectbox(
@@ -30,7 +31,7 @@ if method == "Euler Mejorado":
             "Ecuación dy/dx (ej: y - x\\**2 + 1, x\\*y, 2\\*x\\*y, e\\**x, x\\**1/2)",
             help="Usa 'x' e 'y'. Para raíces: x\\**1/2, e o E para Euler"
         )
-        h_euler = st.number_input("Paso (h) (ej: 0.2)", min_value=0.01, step=0.01)
+        h_euler = st.number_input("Paso (h) (ej: 0.2)", step=0.01)
         x0_euler = st.number_input("x inicial (ej: 0)")
     
     with col2:
@@ -52,7 +53,7 @@ if method == "Euler Mejorado":
             
             fig, ax = plt.subplots(figsize=(10, 5))
             ax.plot(x_vals, y_vals, 'o-', label=f'Euler Mejorado (h={h_euler})', color='green', linewidth=2, markersize=6)
-            ax.plot(x_vals, yr_vals, 's--', label='Solución Exacta', color='red', linewidth=2, markersize=5)
+            # ax.plot(x_vals, yr_vals, 's--', label='Solución Exacta', color='red', linewidth=2, markersize=5)
             ax.set_title(f'Solución: dy/dx = {eq_euler}', fontsize=14)
             ax.set_xlabel('x', fontsize=12)
             ax.set_ylabel('y', fontsize=12)
@@ -123,7 +124,7 @@ elif method == "Runge-Kutta 4":
             "Ecuación dy/dx (ej: 2\\*x\\*y, x\\*y, y - x, e\\**x, x\\**1/2)",
             help="Usa 'x' e 'y'. Para raíces: x\\**1/2, e o E para Euler"
         )
-        h_rk = st.number_input("Tamaño de paso (ej: 0.1)", min_value=0.01, step=0.01)
+        h_rk = st.number_input("Tamaño de paso (ej: 0.1)", step=0.01)
         x0_rk = st.number_input("x inicial (ej: 0)")
     
     with col2:
